@@ -5,49 +5,115 @@
 |
 | The routes file is used for defining the HTTP routes.
 |
+*/ /*
+|--------------------------------------------------------------------------
+| Routes file
+|--------------------------------------------------------------------------
+|
+| The routes file is used for defining the HTTP routes.
+|
 */
-import { Exception } from '@adonisjs/core/exceptions'
-import app from '@adonisjs/core/services/app'
-import router from '@adonisjs/core/services/router'
-import fs from 'node:fs/promises'
 
-router.on('/').render('pages/home')
+import router from '@adonisjs/core/services/router'
+import { middleware } from './kernel.js'
+const HomeController = () => import('#controllers/home_controller')
+const LogoutController = () => import('#controllers/auth/logout_controller')
+const WritersController = () => import('#controllers/writers_controller')
+const RegisterController = () => import('#controllers/auth/register_controller')
+const LoginController = () => import('#controllers/auth/login_controller')
+const DirectorsController = () => import('#controllers/directors_controller')
+const MoviesController = () => import('#controllers/movies_controller')
+const RedisController = () => import('#controllers/redis_controller')
+
+router.get('/', [HomeController, 'index']).as('home')
+
+router.get('/movies', [MoviesController, 'index']).as('movies.index')
 
 router
-  .get('/page/:slug', async (value) => {
-    const url = app.makeURL(`resources/movies/${value.params.slug}.html`)
-    try {
-      const movie = await fs.readFile(url, 'utf8')
-      value.view.share({ movie })
-    } catch (error) {
-      throw new Exception('could not find a movie called ${value.params.slug}', {
-        code: 'E_NOT_FOUND',
-        status: 404,
-      })
-    }
-    return value.view.render('pages/movies/movie')
-  })
-  .as('web.index')
+  .get('/movies/:slug', [MoviesController, 'show'])
+  .as('movies.show')
   .where('slug', router.matchers.slug())
 
-router.on('/movie').render('pages/first')
+router.get('/directors', [DirectorsController, 'index']).as('directors.index')
+router.get('/directors/:id', [DirectorsController, 'show']).as('directors.show')
 
-// router.post('/', () => {}).as('home.store')
+router.get('/writers', [WritersController, 'index']).as('writers.index')
+router.get('/writers/:id', [WritersController, 'show']).as('writers.show')
 
-// router.get('/page/webpage/edit', async (value) => {}).as('web.edit')
+router.delete('/redis/flush', [RedisController, 'flush']).as('redis.flush')
+router.delete('/redis/:slug', [RedisController, 'destroy']).as('redis.destroy')
 
-// router.put('/pages/webpage', () => {}).as('web.update')
+router
+  .group(() => {
+    router
+      .get('/register', [RegisterController, 'show'])
+      .as('register.show')
+      .use(middleware.guest())
 
-// router.get('/movies', () => {}).as('movie.index')
+    router
+      .post('/register', [RegisterController, 'store'])
+      .as('register.store')
+      .use(middleware.guest())
 
-// router.get('/movies/my-movie', () => {}).as('movie.show')
+    router.get('/login', [LoginController, 'show']).as('login.show').use(middleware.guest())
+    router.post('/login', [LoginController, 'store']).as('login.store').use(middleware.guest())
 
-// router.get('/movies/create', () => {}).as('movie.create')
+    router.post('/logout', [LogoutController, 'handle']).as('logout').use(middleware.auth())
+  })
+  .prefix('/auth')
+  .as('auth')
 
-// router.post('/movies', () => {}).as('movie.store')
+router
+  .group(() => {
+    router
+      .get('/', async (ctx) => {
+        return `You are here, ${ctx.auth.user?.fullName} as ${ctx.auth.user?.roleId} role!`
+      })
+      .as('index')
+  })
+  .prefix('/admin')
+  .as('admin')
+  .use(middleware.admin())
+// router
+//   .get('/movies/:slug', async (value) => {
+//     const url = app.makeURL(`resources/movies/${value.params.slug}.md`)
+//     try {
+//       const file = await fs.readFile(url, 'utf8')
+//       const md = new MarkdownFile(file)
 
-// router.get('/movies/my-movie/edit', () => {}).as('movie.edit')
+//       await md.process()
 
-// router.put('/movies/mu-movie', () => {}).as('movie.update')
+//       const movie = toHtml(md).contents
+//       value.view.share({ movie })
+//     } catch (error) {
+//       throw new Exception('could not find a movie called ${value.params.slug}', {
+//         code: 'E_NOT_FOUND',
+//         status: 404,
+//       })
+//     }
+//     return value.view.render('pages/movies/movie')
+//   })
+//   .as('web.index')
+//   .where('slug', router.matchers.slug())
 
-// router.delete('/movies/my-movie', () => {}).as('movie.destroy')
+// router.on('/pages').render('pages/first')
+
+// // router.post('/', () => {}).as('home.store')
+
+// // router.get('/page/webpage/edit', async (value) => {}).as('web.edit')
+
+// // router.put('/pages/webpage', () => {}).as('web.update')
+
+// // router.get('/movies', () => {}).as('movie.index')
+
+// // router.get('/movies/my-movie', () => {}).as('movie.show')
+
+// // router.get('/movies/create', () => {}).as('movie.create')
+
+// // router.post('/movies', () => {}).as('movie.store')
+
+// // router.get('/movies/my-movie/edit', () => {}).as('movie.edit')
+
+// // router.put('/movies/mu-movie', () => {}).as('movie.update')
+
+// // router.delete('/movies/my-movie', () => {}).as('movie.destroy')

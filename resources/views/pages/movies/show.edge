@@ -1,0 +1,78 @@
+@layout({ title: movie.title })
+  @slot('meta')
+    <meta name="description" content="{{ movie.summary }}" />
+  @endslot
+  
+  <h1>
+    {{ movie.title }}
+  </h1>
+
+  <dl class="text-sm py-4">
+    <div class="flex">
+      <dt class="w-24">
+        Writer:
+      </dt>
+      <dd>
+        <a href="{{ route('writers.show', { id: movie.writer.id }) }}">
+          {{ movie.writer.fullName }}
+        </a>
+      </dd>
+    </div>
+    <div class="flex">
+      <dt class="w-24">
+        Director:
+      </dt>
+      <dd>
+        <a href="{{ route('directors.show', { id: movie.director.id }) }}">
+          {{ movie.director.fullName }}
+        </a>
+      </dd>
+    </div>
+  </dl>
+
+  @if (movie.abstract)
+    <div class="my-8 bg-slate-100 rounded-xl p-8">
+      {{{ movie.abstract }}}
+    </div>
+  @else
+    No Abstract
+  @endif
+  
+  <div class="flex flex-wrap justify-between">
+    <div class="w-full lg:w-1/2">
+      <h3 class="font-bold text-lg">
+        Cast
+      </h3>
+      <dl>
+        @each (cineast in cast)
+          <div class="flex items-baseline gap-2">
+            <dt>
+              {{ cineast.$extras.pivot_character_name }}
+            </dt>
+            <dd class="text-slate-400 text-sm">
+              {{ cineast.fullName }}
+            </dd>
+          </div>
+        @endeach
+      </dl>
+    </div>
+
+    <div class="w-full lg:w-1/2">
+      <h3 class="font-bold text-lg">
+        Crew
+      </h3>
+      <dl>
+        @each (cineast in crew)
+          <div class="flex items-baseline gap-2">
+            <dt>
+              {{ cineast.fullName }}
+            </dt>
+            <dd class="text-slate-400 text-sm">
+              {{ cineast.$extras.pivot_title }}
+            </dd>
+          </div>
+        @endeach
+      </dl>
+    </div>
+  </div>
+@end

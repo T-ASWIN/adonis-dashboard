@@ -22,6 +22,16 @@
           </option>
         @endeach
       @end
+
+      @form.input({ type: 'select', label: 'Sort', name: 'sort' })
+       
+        @each (item in movieSortOptions)
+          <option value="{{ item.id }}" {{ html.attrs({ selected: item.id == filters.sort }) }}>
+            {{ item.text }}
+          </option>
+        @endeach
+      @end
+
       
       @button({ type: 'submit' })
         Search

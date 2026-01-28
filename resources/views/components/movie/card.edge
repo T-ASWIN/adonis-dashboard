@@ -1,10 +1,14 @@
 @card({ ...$props.except(['movie']) })
   @slot('picture')
-    <div class="relative">
-      <img src="{{ movie.posterUrl }}" class="w-full h-auto" />
-    </div>
+    <div class="relative w-full h-full">
+  <img
+    src="{{ movie.posterUrl }}"
+    class="w-full h-full object-cover"
+  />
+</div>
+
   @endslot
-  
+
   <h3 class="font-bold leading-none tracking-tight">
     {{ movie.title }}
   </h3>
@@ -12,9 +16,7 @@
   @if (showStatus)
     <dl class="text-xs py-4">
       <div class="flex">
-        <dt class="w-16">
-          Status:
-        </dt>
+        <dt class="w-16">Status:</dt>
         <dd>
           {{ movie.status.name }}
         </dd>
@@ -25,9 +27,7 @@
   @if (showWriterDirector)
     <dl class="text-xs py-4">
       <div class="flex">
-        <dt class="w-16">
-          Writer:
-        </dt>
+        <dt class="w-16">Writer:</dt>
         <dd>
           <a href="{{ route('writers.show', { id: movie.writer.id }) }}">
             {{ movie.writer.fullName }}
@@ -35,9 +35,7 @@
         </dd>
       </div>
       <div class="flex">
-        <dt class="w-16">
-          Director:
-        </dt>
+        <dt class="w-16">Director:</dt>
         <dd>
           <a href="{{ route('directors.show', { id: movie.director.id }) }}">
             {{ movie.director.fullName }}
@@ -50,7 +48,7 @@
       {{ movie.summary }}
     </p>
   @endif
-  
+
   @button({ href: route('movies.show', { slug: movie.slug }) })
     View Movie
   @end

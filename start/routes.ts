@@ -5,17 +5,11 @@
 |
 | The routes file is used for defining the HTTP routes.
 |
-*/ /*
-|--------------------------------------------------------------------------
-| Routes file
-|--------------------------------------------------------------------------
-|
-| The routes file is used for defining the HTTP routes.
-|
 */
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
+const WatchlistsController = () => import('#controllers/watchlists_controller')
 const HomeController = () => import('#controllers/home_controller')
 const LogoutController = () => import('#controllers/auth/logout_controller')
 const WritersController = () => import('#controllers/writers_controller')
@@ -33,6 +27,17 @@ router
   .get('/movies/:slug', [MoviesController, 'show'])
   .as('movies.show')
   .where('slug', router.matchers.slug())
+
+router
+  .group(() => {
+    router.get('/watchlist', [WatchlistsController, 'index']).as('index')
+    router.post('/watchlists/:movieId/toggle', [WatchlistsController, 'toggle']).as('toggle')
+    router
+      .post('/watchlists/:movieId/toggle-watched', [WatchlistsController, 'toggleWatched'])
+      .as('toggle.watched')
+  })
+  .as('watchlists')
+  .use(middleware.auth())
 
 router.get('/directors', [DirectorsController, 'index']).as('directors.index')
 router.get('/directors/:id', [DirectorsController, 'show']).as('directors.show')
@@ -74,7 +79,8 @@ router
   .prefix('/admin')
   .as('admin')
   .use(middleware.admin())
-// router
+  
+  // router
 //   .get('/movies/:slug', async (value) => {
 //     const url = app.makeURL(`resources/movies/${value.params.slug}.md`)
 //     try {

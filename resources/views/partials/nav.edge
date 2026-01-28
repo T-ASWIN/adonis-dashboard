@@ -7,14 +7,22 @@
   </div>
 
   <div>
-    @if(auth.user)
-      <form method='POST' action="{{ route('auth.logout') }}">
-        {{ csrfField() }}<button type="submit" class="text-xs">Logout {{auth.user.fullName}}
-        </form>
-      @else
-        <a href="{{ route('auth.login.show') }}">Login</a>
+    @if (auth.user)
+      <div class="flex items-center gap-3">
+        <a href="{{ route('watchlists.index') }}" class="text-xs">
+          Watchlist
+        </a>
 
-        <a href="{{ route('auth.register.show') }}">Register</a>
-      @endif
-    </div>
-  </nav>
+        <form method="POST" action="{{ route('auth.logout') }}">
+          {{ csrfField() }}
+          <button type="submit" class="text-xs">
+            Logout {{ auth.user.fullName }}
+          </button>
+        </form>
+      </div>
+    @else
+      <a href="{{ route('auth.login.show') }}">Login</a>
+      <a href="{{ route('auth.register.show')}}">Register</a>
+    @endif
+  </div>
+</nav>

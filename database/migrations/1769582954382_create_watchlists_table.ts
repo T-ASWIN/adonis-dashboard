@@ -12,6 +12,8 @@ export default class extends BaseSchema {
 
       table.timestamp('created_at')
       table.timestamp('updated_at')
+
+      table.unique(['user_id', 'movie_id'])
     })
   }
 

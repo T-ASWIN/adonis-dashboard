@@ -9,6 +9,8 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
+import ProfilesController from '#controllers/profiles_controller'
+import AvatarsController from '#controllers/avatars_controller'
 const WatchlistsController = () => import('#controllers/watchlists_controller')
 const HomeController = () => import('#controllers/home_controller')
 const LogoutController = () => import('#controllers/auth/logout_controller')
@@ -20,6 +22,7 @@ const MoviesController = () => import('#controllers/movies_controller')
 const RedisController = () => import('#controllers/redis_controller')
 
 router.get('/', [HomeController, 'index']).as('home')
+router.get('/avatars/:filename',[AvatarsController,'show']).as('avatars.show')
 
 router.get('/movies', [MoviesController, 'index']).as('movies.index')
 
@@ -48,6 +51,9 @@ router.get('/writers/:id', [WritersController, 'show']).as('writers.show')
 router.delete('/redis/flush', [RedisController, 'flush']).as('redis.flush')
 router.delete('/redis/:slug', [RedisController, 'destroy']).as('redis.destroy')
 
+
+router.get('/profile/edit',[ProfilesController,'edit']).as('profile.edit').use(middleware.auth())
+router.put('/profiles',[ProfilesController,'update']).as('profiles.update').use(middleware.auth())
 router
   .group(() => {
     router

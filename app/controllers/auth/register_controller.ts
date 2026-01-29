@@ -15,6 +15,8 @@ export default class RegisterController {
     const data = await request.validateUsing(registerValidator)
     //2.create our user
     const user = await User.create(data)
+    //3.create profile for user
+await user.related('profile').create({})
     //3.login that user
     await auth.use('web').login(user)
     //4.return the user back to home

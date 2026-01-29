@@ -4,7 +4,6 @@ import MovieStatus from '#models/movie_status'
 import MovieService from '#services/movie_service'
 import { movieFilterValidator } from '#validators/movie'
 import router from '@adonisjs/core/services/router'
-import querystring from 'node:querystring'
 
 export default class MoviesController {
   async index({ request, view ,auth}: HttpContext) {
@@ -17,7 +16,7 @@ const filters=await movieFilterValidator.validate(request.qs())
 
     const movieSortOptions=MovieService.sortOptions
 
-    const qs= querystring.stringify(filters)
+    movies.queryString(filters)
 
     movies.baseUrl(router.makeUrl('movies.index'))
 
@@ -30,19 +29,13 @@ const filters=await movieFilterValidator.validate(request.qs())
     })
 
 
-    if(qs){
-      pagination=pagination.map((item)=>{
-        item.url+=`&${qs}`
-        return item
-      })
-    }
     return view.render('pages/movies/index', {
       movies,
       movieStatuses,
       movieSortOptions,
       filters,
       pagination,
-      qs
+      
     })
   }
 

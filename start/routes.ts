@@ -6,20 +6,12 @@
 | The routes file is used for defining the HTTP routes.
 |
 */
-/*
-|--------------------------------------------------------------------------
-| Routes file
-|--------------------------------------------------------------------------
-|
-| The routes file is used for defining the HTTP routes.
-|
-*/
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
-import AdminDashboardController from '#controllers/admin/dashboard_controller'
-const AvatarsController = () => import('#controllers/avatars_controller')
-const AdminMoviesController=()=> import('#controllers/admin/movies_controller')
+const AdminDashboardController = () => import('#controllers/admin/dashboard_controller')
+const AdminMoviesController = () => import('#controllers/admin/movies_controller')
+const StorageController = () => import('#controllers/storage_controller')
 const ProfilesController = () => import('#controllers/profiles_controller')
 const WatchlistsController = () => import('#controllers/watchlists_controller')
 const HomeController = () => import('#controllers/home_controller')
@@ -33,7 +25,7 @@ const RedisController = () => import('#controllers/redis_controller')
 
 router.get('/', [HomeController, 'index']).as('home')
 
-router.get('/avatars/:filename', [AvatarsController, 'show']).as('avatars.show')
+router.get('/storage/*', [StorageController, 'show']).as('storage.show')
 
 router.get('/movies', [MoviesController, 'index']).as('movies.index')
 
@@ -88,15 +80,14 @@ router
 
 router
   .group(() => {
-    router
-      .get('/',[AdminDashboardController,'handle']).as('dashboard')
-  router.resource('movies',AdminMoviesController)
-    })
+    router.get('/', [AdminDashboardController, 'handle']).as('dashboard')
+
+    router.resource('movies', AdminMoviesController)
+  })
   .prefix('/admin')
   .as('admin')
   .use(middleware.admin())
-  
-  // router
+// router
 //   .get('/movies/:slug', async (value) => {
 //     const url = app.makeURL(`resources/movies/${value.params.slug}.md`)
 //     try {
